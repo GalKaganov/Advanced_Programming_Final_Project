@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Graph Visualization</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #E6E6FA; /* lavender light blue-purple */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #mynetwork {
+            width: 100%;
+            height: 100%;
+            background-color: #F0F8FF; /* AliceBlue - light blue */
+        }
+    </style>
+
+    <!-- Use vis-network from jsDelivr (maintained fork of vis.js) -->
+    <link href="https://cdn.jsdelivr.net/npm/vis-network@9.1.2/styles/vis-network.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vis-network@9.1.2/dist/vis-network.min.js"></script>
+</head>
+<body>
+<div id="mynetwork"></div>
+<script>
+    const nodes = new vis.DataSet([
+        // Nodes will be inserted here by Java code
+    ]);
+
+    const edges = new vis.DataSet([
+        // Edges will be inserted here by Java code
+    ]);
+
+    const container = document.getElementById('mynetwork');
+    const data = {
+        nodes: nodes,
+        edges: edges
+    };
+    const options = {
+        nodes: {
+            shape: 'dot',
+            size: 16,
+            color: {
+                background: '#9370DB', // medium purple
+                highlight: {
+                    background: '#9370DB', // Keep the same color when highlighted
+                    border: '#9370DB'
+                }
+            },
+            font: {
+                color: '#FFFFFF',
+                size: 16,
+                face: 'Segoe UI',
+                bold: {
+                    color: '#FFFFFF', // Keep the same color when bold
+                    size: 16,
+                    mod: 'bold'
+                }
+            },
+            scaling: {
+                min: 10,
+                max: 30
+            },
+            borderWidth: 2
+        },
+        edges: {
+            arrows: {
+                to: { enabled: true, scaleFactor: 1 }
+            },
+            color: {
+                color: '#7B68EE', // light slate blue edges
+                highlight: '#7B68EE' // Keep the same color when highlighted
+            },
+            smooth: true,
+            font: {
+                size: 14,
+                align: 'middle',
+                color: '#000000',
+                strokeWidth: 0,
+                strokeColor: '#ffffff'
+            }
+        },
+        physics: {
+            enabled: true,
+            stabilization: {
+                enabled: true,
+                iterations: 1000,
+                fit: true
+            },
+            barnesHut: {
+                gravitationalConstant: -2000,
+                centralGravity: 0.3,
+                springLength: 100,
+                springConstant: 0.05,
+                damping: 0.09
+            }
+        },
+        interaction: {
+            hover: true,
+            selectConnectedEdges: true
+        }
+    };
+    
+    // Create the network
+    const network = new vis.Network(container, data, options);
+    
+    // Helper function to format node labels with values
+    function formatNodeLabel(label, value) {
+        if (value === undefined || value === null) {
+            return label;
+        }
+        return `${label}\n${value}`;
+    }
+    
+    // Update existing nodes to show values
+    nodes.update(nodes.get().map(node => ({
+        ...node,
+        label: formatNodeLabel(node.label, node.value)
+    })));
+
+    // Function to update edge labels
+    function updateEdgeLabels() {
+        const currentEdges = edges.get();
+        edges.update(currentEdges.map(edge => ({
+            ...edge,
+            label: edge.label || ''
+        })));
+    }
+
+    // Initial update of edge labels
+    updateEdgeLabels();
+
+    // Set up periodic updates without refreshing
+    setInterval(() => {
+        // Fetch new data from server, add cache-busting parameter
+        fetch(window.location.href + '?t=' + new Date().getTime()) 
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const scriptText = doc.querySelector('script').textContent; // Assuming graph data is in the first script tag
+
+                const nodesDataRegex = /const nodes = new vis\.DataSet\(\[([\s\S]*?)\]\)/;
+                const edgesDataRegex = /const edges = new vis\.DataSet\(\[([\s\S]*?)\]\)/;
+
+                const nodesMatch = scriptText.match(nodesDataRegex);
+                const edgesMatch = scriptText.match(edgesDataRegex);
+
+                if (nodesMatch && nodesMatch[1]) {
+                    const nodesDataString = nodesMatch[1];
+                    // Safely create an array from the string of JS object literals
+                    const newNodesArray = new Function('return [' + nodesDataString + '];')();
+                    nodes.update(newNodesArray.map(node => ({
+                        ...node,
+                        label: formatNodeLabel(node.label, node.value)
+                    })));
+                }
+
+                if (edgesMatch && edgesMatch[1]) {
+                    const edgesDataString = edgesMatch[1];
+                    // Safely create an array from the string of JS object literals
+                    const newEdgesArray = new Function('return [' + edgesDataString + '];')();
+                    edges.update(newEdgesArray.map(edge => ({
+                        ...edge,
+                        label: edge.label || '' // Ensure label is at least an empty string
+                    })));
+                }
+            })
+            .catch(error => console.error('Error updating graph:', error));
+    }, 1000); // Update every second
+
+    // Handle node selection
+    network.on("selectNode", function(params) {
+        if (params.nodes.length > 0) {
+            const selectedNode = nodes.get(params.nodes[0]);
+            // Only make text bold without changing colors
+            selectedNode.font = {
+                ...selectedNode.font,
+                bold: true
+            };
+            nodes.update(selectedNode);
+        }
+    });
+
+    // Handle node deselection
+    network.on("deselectNode", function(params) {
+        nodes.get().forEach(node => {
+            node.font = {
+                ...node.font,
+                bold: false
+            };
+            nodes.update(node);
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Forms</title>
+    <style>
+        /* Page styling */
+        body {
+            height: 60px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background-color: #F0F8FF; /* Light blue background */
+        }
+
+
+
+        /* Form container */
+        form {
+            margin-bottom: 40px;
+            margin-top: 25px;
+            padding: 10px;
+            border: 1px solid #66A3FF; /* Light blue border */
+            background-color: #FFFFFF; /* White background */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Labels styling */
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #003366; /* Dark blue */
+        }
+
+        /* Input fields and button styling */
+        input[type="file"],
+        input[type="text"],
+        button {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #66A3FF;
+            box-sizing: border-box;
+            font-size: 12px;
+        }
+
+        /* Input background colors */
+        input[type="file"],
+        input[type="text"] {
+            background-color: #E6F0FF; /* Very light blue */
+        }
+
+        /* Button styles */
+        button {
+            background-color: #004C99; /* Stronger blue */
+            color: white;
+            border: black;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Button hover effect */
+        button:hover {
+            background-color: #66A3FF; /* Lighter blue on hover */
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Section for deploying configuration -->
+<!--<h2>Configuration</h2>-->
+<form id="deployForm">
+    <label for="configFile">Config File</label>
+    <input type="file" id="configFile" name="configFile" required>
+    <button type="button" onclick="deployConfig()">Deploy</button>
+</form>
+
+<!-- Section for sending a message to a topic -->
+<!--<h2>Send Message</h2>-->
+<form id="messageForm">
+    <label for="topicName">Topic Name</label>
+    <input type="text" id="topicName" name="topicName" required>
+
+    <label for="message">Message</label>
+    <input type="text" id="message" name="message" required>
+
+    <button type="button" onclick="sendMessageToTopic()">Send</button>
+</form>
+
+<script>
+    // Sends a message to a given topic
+    function sendMessageToTopic() {
+        const topicName = document.getElementById('topicName').value;
+        const message = document.getElementById('message').value;
+
+        fetch(`http://localhost:8080/publish?topicName=${topicName}&message=${message}`)
+            .then(response => {
+                if (response.status === 200) {
+                    // If successful, update the right iframe with the result
+                    return response.text().then(text => {
+                        const rightIframe = parent.document.querySelector('.right-frame iframe');
+                        rightIframe.srcdoc = text;
+                    });
+                } else {
+                    // Handle error response
+                    return response.text().then(text => {
+                        if (response.status === 500 && text.includes('Topic does not exist')) {
+                            alert('The topic does not exist.');
+                        } else {
+                            console.error('Error:', text);
+                            alert('An error occurred while sending the message to the topic.');
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while sending the message to the topic.');
+            });
+    }
+
+    // Uploads and deploys a configuration file
+    function deployConfig() {
+        const form = document.getElementById('deployForm');
+        const formData = new FormData(form);
+        const fileInput = document.getElementById('configFile');
+        formData.append('configFile', fileInput.files[0]);
+
+        fetch('http://localhost:8080/upload', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    // If successful, update the center iframe with the result
+                    return response.text().then(html => {
+                        const middleIframe = parent.document.querySelector('.center-frame iframe');
+                        middleIframe.srcdoc = html;
+                    });
+                } else {
+                    // Handle upload error
+                    return response.text().then(text => {
+                        console.error('Error:', text);
+                        alert('An error occurred while deploying the configuration.');
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deploying the configuration.');
+            });
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Topics</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background-color: #F0F8FF;
+            height: 80vh;
+            margin: 0;
+        }
+
+        .container {
+            margin: 10px;
+            padding: 15px;
+            border: 1px solid #66A3FF;
+            background-color: #FFFFFF;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: calc(100% - 60px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-size: 18px;
+            color: #003366;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #E6F0FF;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: #66A3FF;
+            border-radius: 0;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #004C99;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            font-size: 12px;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            word-wrap: break-word;
+            border: 1px solid #66A3FF;
+        }
+
+        th {
+            background-color: #004C99;
+            color: white;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tbody tr {
+            background-color: #E6F0FF;
+            transition: background-color 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background-color: #FFFFFF;
+        }
+
+        td {
+            color: #003366;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #003366;
+            font-style: italic;
+            padding: 15px;
+            background-color: #E6F0FF;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Topics</h1>
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>Topic</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr id="null-data">
+                <td colspan="2" class="no-data">Add Topic</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

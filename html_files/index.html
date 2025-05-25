@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Graph Application</title>
+    <style>
+        /* General body styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(120deg, #E6E6FA, #dceeff);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* Wrapper for all the frames */
+        .frames-wrapper {
+            display: flex;
+            flex: 1;
+            padding: 15px;
+            gap: 15px;
+        }
+
+        /* Common frame container styling */
+        .frame-container {
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 32px rgba(0, 51, 102, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .frame-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 51, 102, 0.15);
+        }
+
+        /* All iframes take full size of their container */
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Left frame (forms) styling */
+        .left-frame {
+            flex: 2;
+            background-color: rgba(230, 230, 250, 0.5);
+            border: 2px solid rgba(0, 51, 102, 0.1);
+        }
+
+        /* Center frame (graph) styling */
+        .center-frame {
+            flex: 6;
+            background-color: rgba(220, 238, 255, 0.5);
+            border: 2px solid rgba(0, 51, 102, 0.1);
+        }
+
+        /* Right frame (table) styling */
+        .right-frame {
+            flex: 2;
+            background-color: rgba(240, 240, 240, 0.5);
+            border: 2px solid rgba(0, 51, 102, 0.1);
+        }
+
+        /* Footer styling */
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #003366;
+            color: #fff;
+            font-size: 12px;
+            user-select: none;
+            box-shadow: 0 -4px 16px rgba(0, 51, 102, 0.1);
+        }
+
+        footer span {
+            opacity: 0.9;
+            transition: opacity 0.3s ease;
+        }
+
+        footer span:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Main wrapper containing the three frames -->
+<div class="frames-wrapper">
+    <!-- Left frame: Form interactions -->
+    <div class="frame-container left-frame">
+        <iframe src="from.html"></iframe>
+    </div>
+
+    <!-- Center frame: Graph display -->
+    <div class="frame-container center-frame">
+        <iframe src="temp.html"></iframe>
+    </div>
+
+    <!-- Right frame: Table or status display -->
+    <div class="frame-container right-frame">
+        <iframe src="table.html"></iframe>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <span>&copy; 2025 Gal Kaganovsky & Dana Bakshe</span>
+</footer>
+
+</body>
+</html>
